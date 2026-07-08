@@ -125,7 +125,7 @@
         .character-img {
             max-height: 85%;
             max-width: 95%;
-            object-fit: contain; /* Mostra il 100% dell'immagine senza tagliarla */
+            object-fit: contain; 
             filter: drop-shadow(5px 5px 0px rgba(0,0,0,0.2));
         }
 
@@ -238,7 +238,7 @@
             box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
         }
 
-        /* Schermata Collage (Ottimizzata al 100% per non tagliare le foto) */
+        /* Schermata Collage */
         .collage-container {
             display: flex;
             gap: 15px;
@@ -250,11 +250,11 @@
         .collage-img {
             width: 30%;
             height: 100%;
-            object-fit: contain; /* Garantisce la visualizzazione completa al 100% delle foto */
+            object-fit: contain; 
             border: 3px solid #fff;
             border-radius: 8px;
             box-shadow: 3px 3px 0px #4a148c;
-            background: rgba(255, 255, 255, 0.1); /* Sfondo leggero se le proporzioni differiscono */
+            background: rgba(255, 255, 255, 0.1); 
         }
 
         /* Schermata Musica */
@@ -391,23 +391,27 @@
         <div id="screen-music" class="screen">
             <h2 style="font-size: 14px; margin-bottom: 20px; text-shadow: 2px 2px 0px #4a148c; text-align: center;">UNA CANZONE PER TE</h2>
             
-            <div class="player-interface">
-                <div class="player-header">
-                    <span>Riproduttore.exe</span>
-                    <span>_ □ x</span>
-                </div>
-                <div class="player-body">
-                    <iframe 
-                        id="yt-player"
-                        width="100%" 
-                        height="140" 
-                        src="" 
-                        title="Canzone per te" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        allowfullscreen 
-                        style="border: 2px solid #4a148c; border-radius: 4px; display: block;">
-                    </iframe>
+            <button id="play-music-btn" class="pixel-btn" style="font-size: 14px; padding: 15px 30px; margin-bottom: 20px;" onclick="startMusic()">CLICCA PER LA MUSICA 🎵</button>
+            
+            <div id="player-wrapper" style="display: none; width: 100%; max-width: 420px; z-index: 2;">
+                <div class="player-interface">
+                    <div class="player-header">
+                        <span>Riproduttore.exe</span>
+                        <span>_ □ x</span>
+                    </div>
+                    <div class="player-body">
+                        <iframe 
+                            id="yt-player"
+                            width="100%" 
+                            height="140" 
+                            src="" 
+                            title="Canzone per te" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen 
+                            style="border: 2px solid #4a148c; border-radius: 4px; display: block;">
+                        </iframe>
+                    </div>
                 </div>
             </div>
 
@@ -422,12 +426,15 @@
                 screen.classList.remove('active');
             });
             document.getElementById(screenId).classList.add('active');
+        }
 
-            if (screenId === 'screen-music') {
-                const player = document.getElementById('yt-player');
-                // Carica l'esatto link nocookie passato in modalità autoplay + loop continuo
-                player.src = "https://www.youtube-nocookie.com/embed/8IIoBxbqwtg?playlist=8IIoBxbqwtg&autoplay=1&iv_load_policy=3&loop=1&start=";
-            }
+        // Funzione per avviare la musica dopo il click sul bottone
+        function startMusic() {
+            document.getElementById('play-music-btn').style.display = 'none'; // Nasconde il bottone
+            document.getElementById('player-wrapper').style.display = 'block'; // Mostra il player
+            
+            const player = document.getElementById('yt-player');
+            player.src = "https://www.youtube-nocookie.com/embed/8IIoBxbqwtg?playlist=8IIoBxbqwtg&autoplay=1&iv_load_policy=3&loop=1&start=";
         }
 
         const correctPin = "2212";
@@ -464,56 +471,6 @@
                 display.innerText = currentInput + "_".repeat(4 - currentInput.length);
             }
         }
-        function nextScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            document.getElementById(screenId).classList.add('active');
-
-            if (screenId === 'screen-music') {
-                const player = document.getElementById('yt-player');
-                // Ho aggiunto '&mute=1' alla fine. È FONDAMENTALE per l'autoplay su mobile.
-                // Senza questo, il browser bloccherà il video.
-                player.src = "https://www.youtube-nocookie.com/embed/8IIoBxbqwtg?playlist=8IIoBxbqwtg&autoplay=1&iv_load_policy=3&loop=1&start=";
-            }
-        }
-
-        const correctPin = "2212";
-        let currentInput = "";
-
-        function pressKey(num) {
-            if (currentInput.length < 4) {
-                currentInput += num;
-                updateDisplay();
-            }
-            
-            if (currentInput === correctPin) {
-                setTimeout(() => {
-                    nextScreen('screen-dialogue');
-                }, 300);
-            } else if (currentInput.length === 4) {
-                setTimeout(() => {
-                    alert("Codice errato! Riprova ❤️");
-                    clearKey();
-                }, 300);
-            }
-        }
-
-        function clearKey() {
-            currentInput = "";
-            updateDisplay();
-        }
-
-        function updateDisplay() {
-            const display = document.getElementById('pin-display');
-            if(currentInput.length === 0) {
-                display.innerText = "____";
-            } else {
-                display.innerText = currentInput + "_".repeat(4 - currentInput.length);
-            }
-        }
-    
-
     </script>
 </body>
 </html>
