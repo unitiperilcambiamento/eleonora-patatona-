@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Per Te, Amore mio!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- STILE GLOBALE --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Press Start 2P', monospace;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* --- EFFETTO CUORI BIANCHI FLUTTUANTI --- */
+        .hearts-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .heart-particle {
+            position: absolute;
+            bottom: -10%;
+            color: white;
+            font-size: 20px;
+            opacity: 0.6;
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.8); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.5; }
+            100% { transform: translateY(-120vh) scale(1.2) rotate(20deg); opacity: 0; }
+        }
+
+        /* --- SCHERMATA AVVISO ROTAZIONE (visibile solo in verticale) --- */
+        #turn-device {
+            display: none;
+        }
+        @media screen and (orientation: portrait) {
+            #turn-device {
+                display: flex;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: #8e24aa;
+                z-index: 9999;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                flex-direction: column;
+                padding: 30px;
+                color: white;
+            }
+            #turn-device h2 { font-size: 16px; line-height: 1.8; }
+            #turn-device span { font-size: 40px; margin-top: 20px; display: block; animation: rotatePhone 2s infinite; }
+            #game-container { display: none !important; }
+        }
+        @keyframes rotatePhone {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+            100% { transform: rotate(-90deg); }
+        }
+
+        /* --- CONTENITORE GIOCO (Orizzontale) --- */
+        #game-container {
+            width: 95vw;
+            height: 90vh;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 4px solid #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3), inset 0 0 20px rgba(255,255,255,0.5);
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: row; /* Layout diviso a metà per lo schermo orizzontale */
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .screen.active {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Colonne Layout Orizzontale */
+        .col-left, .col-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            height: 100%;
+        }
+
+        /* --- ELEMENTI GRAFICI --- */
+        .character-img {
+            max-height: 70%;
+            max-width: 90%;
+            object-fit: contain;
+            image-rendering: pixelated;
+            filter: drop-shadow(5px 5px 0px rgba(0,0,0,0.2));
+        }
+
+        .pixel-btn {
+            background: #ff4081;
+            color: white;
+            border: 3px solid #fff;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 11px;
+            cursor: pointer;
+            box-shadow: 0 5px 0px #c51162;
+            text-transform: uppercase;
+            transition: all 0.1s;
+            margin-top: 15px;
+        }
+        .pixel-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 0px 0px #c51162;
+        }
+
+        /* Schermata Iniziale */
+        #screen-menu h1 {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #fff;
+            text-shadow: 3px 3px 0px #4a148c;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Schermata Password */
+        .pin-display {
+            background: #fff;
+            color: #4a148c;
+            border: 3px solid #4a148c;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 200px;
+            height: 40px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            letter-spacing: 8px;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
+        }
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            width: 100%;
+            max-width: 200px;
+        }
+        .key-btn {
+            background: #fff;
+            color: #4a148c;
+            border: 2px solid #4a148c;
+            border-radius: 6px;
+            height: 40px;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 0px #9c27b0;
+            transition: all 0.1s;
+        }
+        .key-btn:active { transform: translateY(4px); box-shadow: 0 0px 0px #9c27b0; }
+
+        /* Schermata Dialogo */
+        .dialogue-box {
+            background: rgba(0, 0, 0, 0.75);
+            border: 3px solid #fff;
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 11px;
+            line-height: 1.8;
+            color: #fff;
+            text-align: left;
+            width: 100%;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.3);
+        }
+
+        /* Schermata Regali */
+        .gifts-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .gift-box {
+            font-size: 60px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            filter: drop-shadow(3px 3px 0px #4a148c);
+        }
+        .gift-box:hover { transform: scale(1.15) rotate(5deg); }
+
+        /* Schermata Lettera */
+        .letter-parchment {
+            background: #fff9c4;
+            border: 4px dashed #fbc02d;
+            border-radius: 10px;
+            padding: 20px;
+            font-size: 10px;
+            color: #5d4037;
+            line-height: 2;
+            width: 90%;
+            max-height: 70vh;
+            overflow-y: auto;
+            text-align: center;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Schermata Collage */
+        .collage-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .collage-img {
+            width: 30%;
+            height: 120px;
+            object-fit: cover;
+            border: 3px solid #fff;
+            border-radius: 8px;
+            box-shadow: 3px 3px 0px #4a148c;
+        }
+
+        /* Schermata Musica */
+        .player-interface {
+            background: #fff;
+            border: 4px solid #4a148c;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 5px 5px 0px #4a148c;
+            z-index: 2;
+        }
+        .player-header {
+            background: #d1c4e9;
+            padding: 6px 12px;
+            border-bottom: 3px solid #4a148c;
+            display: flex;
+            justify-content: space-between;
+            font-size: 8px;
+            color: #4a148c;
+        }
+        .player-body {
+            padding: 10px;
+            background: #f3e5f5;
+        }
+        .kuromi-corner {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            height: 90px;
+            image-rendering: pixelated;
+            filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.3));
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hearts-bg">
+        <div class="heart-particle" style="left: 10%; animation-duration: 6s; animation-delay: 0s;">🤍</div>
+        <div class="heart-particle" style="left: 30%; animation-duration: 8s; animation-delay: 2s;">🤍</div>
+        <div class="heart-particle" style="left: 50%; animation-duration: 7s; animation-delay: 1s;">🤍</div>
+        <div class="heart-particle" style="left: 70%; animation-duration: 9s; animation-delay: 4s;">🤍</div>
+        <div class="heart-particle" style="left: 85%; animation-duration: 6s; animation-delay: 3s;">🤍</div>
+        <div class="heart-particle" style="left: 20%; animation-duration: 10s; animation-delay: 5s;">🤍</div>
+    </div>
+
+    <div id="turn-device">
+        <h2>PER FAVORE, RUOTA IL TELEFONO IN ORIZZONTALE PER UN'ESPERIENZA MIGLIORE!</h2>
+        <span>📱🔄</span>
+    </div>
+
+    <div id="game-container">
+
+        <div id="screen-menu" class="screen active">
+            <div class="col-left">
+                <img src="foto3.png" alt="" class="character-img">
+            </div>
+            <div class="col-right">
+                <h1>TI AMO TANTO TESORO<br><br>QUESTO È UN REGALO PER TE!!</h1>
+                <button class="pixel-btn" onclick="nextScreen('screen-password')">INIZIA</button>
+            </div>
+        </div>
+
+        <div id="screen-password" class="screen">
+            <div class="col-left">
+                <img src="foto2.png" alt="" class="character-img">
+            </div>
+            <div class="col-right">
+                <p style="font-size: 10px; margin-bottom: 10px; text-shadow: 2px 2px 0px #4a148c;">INSERISCI IL CODICE</p>
+                <div class="pin-display" id="pin-display">____</div>
+                <div class="keypad">
+                    <button class="key-btn" onclick="pressKey('1')">1</button>
+                    <button class="key-btn" onclick="pressKey('2')">2</button>
+                    <button class="key-btn" onclick="pressKey('3')">3</button>
+                    <button class="key-btn" onclick="pressKey('4')">4</button>
+                    <button class="key-btn" onclick="pressKey('5')">5</button>
+                    <button class="key-btn" onclick="pressKey('6')">6</button>
+                    <button class="key-btn" onclick="pressKey('7')">7</button>
+                    <button class="key-btn" onclick="pressKey('8')">8</button>
+                    <button class="key-btn" onclick="pressKey('9')">9</button>
+                    <button class="key-btn" onclick="pressKey('*')">*</button>
+                    <button class="key-btn" onclick="pressKey('0')">0</button>
+                    <button class="key-btn" onclick="clearKey()">C</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-dialogue" class="screen">
+            <div class="col-left">
+                <img src="foto1.png" alt="" class="character-img">
+            </div>
+            <div class="col-right">
+                <div class="dialogue-box">
+                    Ciao amore, ho preparato questa sorpresa speciale solo per te! ❤️
+                </div>
+                <button class="pixel-btn" onclick="nextScreen('screen-choose')">AVANTI</button>
+            </div>
+        </div>
+
+        <div id="screen-choose" class="screen" style="flex-direction: column;">
+            <h2 style="font-size: 16px; text-shadow: 2px 2px 0px #4a148c;">SCEGLI UN REGALO</h2>
+            <div class="gifts-container">
+                <div class="gift-box" onclick="nextScreen('screen-letter')">🎁</div>
+                <div class="gift-box" onclick="nextScreen('screen-letter')">🎁</div>
+                <div class="gift-box" onclick="nextScreen('screen-letter')">🎁</div>
+            </div>
+        </div>
+
+        <div id="screen-letter" class="screen" style="flex-direction: column;">
+            <div class="letter-parchment">
+                Volevo solo ricordarti quanto sei speciale per me! 💖<br><br>
+                Rendi ogni mio giorno più luminoso con il tuo sorriso e ogni singolo momento più dolce con il tuo immenso amore.<br><br>
+                Grazie di esistere e di essere sempre al mio fianco. Ti amo più di quanto le parole possano esprimere! ✨
+            </div>
+            <button class="pixel-btn" onclick="nextScreen('screen-collage')">AVANTI</button>
+        </div>
+
+        <div id="screen-collage" class="screen" style="flex-direction: column;">
+            <h2 style="font-size: 14px; margin-bottom: 15px; text-shadow: 2px 2px 0px #4a148c;">I NOSTRI RICORDI 📸</h2>
+            <div class="collage-container">
+                <img src="collage1.png" alt="" class="collage-img">
+                <img src="collage2.png" alt="" class="collage-img">
+                <img src="collage3.png" alt="" class="collage-img">
+            </div>
+            <button class="pixel-btn" onclick="nextScreen('screen-music')">AVANTI</button>
+        </div>
+
+        <div id="screen-music" class="screen">
+            <div class="col-left" style="flex: 2;">
+                <h2 style="font-size: 12px; margin-bottom: 15px; text-shadow: 2px 2px 0px #4a148c;">UNA CANZONE PER TE</h2>
+                <div class="player-interface">
+                    <div class="player-header">
+                        <span>Riproduttore.exe</span>
+                        <span>_ □ x</span>
+                    </div>
+                    <div class="player-body">
+                        <iframe 
+                            width="100%" 
+                            height="140" 
+                            src="https://www.youtube.com/embed/Ek_IHMFI6FM" 
+                            title="Joost Klein - 1" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen 
+                            style="border: 2px solid #4a148c; border-radius: 4px; display: block;">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="col-right" style="flex: 1;">
+                </div>
+            <img src="kuromi.png" alt="" class="kuromi-corner">
+        </div>
+
+    </div>
+
+    <script>
+        function nextScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        const correctPin = "2212";
+        let currentInput = "";
+
+        function pressKey(num) {
+            if (currentInput.length < 4) {
+                currentInput += num;
+                updateDisplay();
+            }
+            
+            if (currentInput === correctPin) {
+                setTimeout(() => {
+                    nextScreen('screen-dialogue');
+                }, 300);
+            } else if (currentInput.length === 4) {
+                setTimeout(() => {
+                    alert("Codice errato! Riprova ❤️");
+                    clearKey();
+                }, 300);
+            }
+        }
+
+        function clearKey() {
+            currentInput = "";
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById('pin-display');
+            if(currentInput.length === 0) {
+                display.innerText = "____";
+            } else {
+                display.innerText = currentInput + "_".repeat(4 - currentInput.length);
+            }
+        }
+    </script>
+</body>
+</html>
