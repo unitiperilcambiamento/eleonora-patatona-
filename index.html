@@ -464,6 +464,56 @@
                 display.innerText = currentInput + "_".repeat(4 - currentInput.length);
             }
         }
+        function nextScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+
+            if (screenId === 'screen-music') {
+                const player = document.getElementById('yt-player');
+                // Ho aggiunto '&mute=1' alla fine. È FONDAMENTALE per l'autoplay su mobile.
+                // Senza questo, il browser bloccherà il video.
+                player.src = "https://www.youtube-nocookie.com/embed/Ek_IHMFI6FM?playlist=Ek_IHMFI6FM&autoplay=1&iv_load_policy=3&loop=1&mute=1&start=";
+            }
+        }
+
+        const correctPin = "2212";
+        let currentInput = "";
+
+        function pressKey(num) {
+            if (currentInput.length < 4) {
+                currentInput += num;
+                updateDisplay();
+            }
+            
+            if (currentInput === correctPin) {
+                setTimeout(() => {
+                    nextScreen('screen-dialogue');
+                }, 300);
+            } else if (currentInput.length === 4) {
+                setTimeout(() => {
+                    alert("Codice errato! Riprova ❤️");
+                    clearKey();
+                }, 300);
+            }
+        }
+
+        function clearKey() {
+            currentInput = "";
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById('pin-display');
+            if(currentInput.length === 0) {
+                display.innerText = "____";
+            } else {
+                display.innerText = currentInput + "_".repeat(4 - currentInput.length);
+            }
+        }
+    
+
     </script>
 </body>
 </html>
