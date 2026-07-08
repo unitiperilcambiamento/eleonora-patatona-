@@ -98,7 +98,7 @@
             width: 100%;
             height: 100%;
             display: none;
-            flex-direction: row; /* Layout diviso a metà per lo schermo orizzontale */
+            flex-direction: row; 
             align-items: center;
             justify-content: center;
             padding: 20px;
@@ -201,7 +201,7 @@
             border: 3px solid #fff;
             border-radius: 12px;
             padding: 20px;
-            font-size: 11px;
+            font-size: 10px; /* Testo leggermente ridotto per far entrare il nuovo messaggio */
             line-height: 1.8;
             color: #fff;
             text-align: left;
@@ -256,12 +256,15 @@
             box-shadow: 3px 3px 0px #4a148c;
         }
 
-        /* Schermata Musica */
+        /* Schermata Musica (CENTRATA) */
+        #screen-music {
+            flex-direction: column; /* Centra tutto in verticale e in orizzontale */
+        }
         .player-interface {
             background: #fff;
             border: 4px solid #4a148c;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 5px 5px 0px #4a148c;
@@ -280,13 +283,15 @@
             padding: 10px;
             background: #f3e5f5;
         }
+        
+        /* Kuromi ingrandita */
         .kuromi-corner {
             position: absolute;
-            bottom: 10px;
+            bottom: 5px;
             right: 15px;
-            height: 90px;
+            height: 150px; /* Grandezza aumentata per maggiore visibilità */
             image-rendering: pixelated;
-            filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.3));
+            filter: drop-shadow(3px 3px 0px rgba(0,0,0,0.4));
             z-index: 1;
         }
     </style>
@@ -349,7 +354,7 @@
             </div>
             <div class="col-right">
                 <div class="dialogue-box">
-                    Ciao amore, ho preparato questa sorpresa speciale solo per te! ❤️
+                    ciao amoreee, complimenti che hai indovinato la password non era scontata come cosa. ti amo tanto e questo è un regalo per te, spero ti piaccia tanto, mi sono impegnato tanto per fartelo. ti amo tantissimo!!
                 </div>
                 <button class="pixel-btn" onclick="nextScreen('screen-choose')">AVANTI</button>
             </div>
@@ -384,29 +389,28 @@
         </div>
 
         <div id="screen-music" class="screen">
-            <div class="col-left" style="flex: 2;">
-                <h2 style="font-size: 12px; margin-bottom: 15px; text-shadow: 2px 2px 0px #4a148c;">UNA CANZONE PER TE</h2>
-                <div class="player-interface">
-                    <div class="player-header">
-                        <span>Riproduttore.exe</span>
-                        <span>_ □ x</span>
-                    </div>
-                    <div class="player-body">
-                        <iframe 
-                            width="100%" 
-                            height="140" 
-                            src="https://www.youtube.com/embed/Ek_IHMFI6FM" 
-                            title="Joost Klein - 1" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen 
-                            style="border: 2px solid #4a148c; border-radius: 4px; display: block;">
-                        </iframe>
-                    </div>
+            <h2 style="font-size: 14px; margin-bottom: 20px; text-shadow: 2px 2px 0px #4a148c; text-align: center;">UNA CANZONE PER TE</h2>
+            
+            <div class="player-interface">
+                <div class="player-header">
+                    <span>Riproduttore.exe</span>
+                    <span>_ □ x</span>
+                </div>
+                <div class="player-body">
+                    <iframe 
+                        id="yt-player"
+                        width="100%" 
+                        height="140" 
+                        src="" 
+                        title="Canzone per te" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen 
+                        style="border: 2px solid #4a148c; border-radius: 4px; display: block;">
+                    </iframe>
                 </div>
             </div>
-            <div class="col-right" style="flex: 1;">
-                </div>
+
             <img src="kuromi.png" alt="" class="kuromi-corner">
         </div>
 
@@ -414,10 +418,19 @@
 
     <script>
         function nextScreen(screenId) {
+            // Nasconde tutte le schermate
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
+            // Mostra quella richiesta
             document.getElementById(screenId).classList.add('active');
+
+            // SE stiamo entrando nella schermata della musica, CARICA E FAI PARTIRE IL VIDEO IN AUTOMATICO
+            if (screenId === 'screen-music') {
+                const player = document.getElementById('yt-player');
+                // Aggiunto "?autoplay=1" alla fine del link per avviarlo da solo
+                player.src = "https://www.youtube.com/embed/Ek_IHMFI6FM?autoplay=1";
+            }
         }
 
         const correctPin = "2212";
