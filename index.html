@@ -201,7 +201,7 @@
             border: 3px solid #fff;
             border-radius: 12px;
             padding: 20px;
-            font-size: 10px; /* Testo leggermente ridotto per far entrare il nuovo messaggio */
+            font-size: 10px; 
             line-height: 1.8;
             color: #fff;
             text-align: left;
@@ -223,19 +223,19 @@
         }
         .gift-box:hover { transform: scale(1.15) rotate(5deg); }
 
-        /* Schermata Lettera */
+        /* Schermata Lettera (Ottimizzata per testi lunghi) */
         .letter-parchment {
             background: #fff9c4;
             border: 4px dashed #fbc02d;
             border-radius: 10px;
             padding: 20px;
-            font-size: 10px;
+            font-size: 9px; /* Ridotto leggermente per farlo scorrere perfettamente */
             color: #5d4037;
             line-height: 2;
             width: 90%;
-            max-height: 70vh;
-            overflow-y: auto;
-            text-align: center;
+            max-height: 60vh;
+            overflow-y: auto; /* Permette lo scorrimento se il testo è lungo */
+            text-align: left;
             box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
         }
 
@@ -256,9 +256,9 @@
             box-shadow: 3px 3px 0px #4a148c;
         }
 
-        /* Schermata Musica (CENTRATA) */
+        /* Schermata Musica */
         #screen-music {
-            flex-direction: column; /* Centra tutto in verticale e in orizzontale */
+            flex-direction: column; 
         }
         .player-interface {
             background: #fff;
@@ -289,7 +289,7 @@
             position: absolute;
             bottom: 5px;
             right: 15px;
-            height: 150px; /* Grandezza aumentata per maggiore visibilità */
+            height: 150px; 
             image-rendering: pixelated;
             filter: drop-shadow(3px 3px 0px rgba(0,0,0,0.4));
             z-index: 1;
@@ -371,9 +371,8 @@
 
         <div id="screen-letter" class="screen" style="flex-direction: column;">
             <div class="letter-parchment">
-                Volevo solo ricordarti quanto sei speciale per me! 💖<br><br>
-                Rendi ogni mio giorno più luminoso con il tuo sorriso e ogni singolo momento più dolce con il tuo immenso amore.<br><br>
-                Grazie di esistere e di essere sempre al mio fianco. Ti amo più di quanto le parole possano esprimere! ✨
+                ti amo tanto tesoro, sei la mia vita e so che sarà la centesima volta che te lo dico, ma è così. ti amo così tanto ele come ti ho già detto con te mi sento al sicuro, ti amo tanto tanto tesoro. io ele voglio vivere per sempre con te perché sei così dolce, mi tratti bene e sei stupenda. non hai nessun difetto sei perfetta così come sei e dovresti iniziarlo a credere anche te. ogni volta che fai un sorriso mi fai così tenerezza e mi fai ricordare quando alle medie scherzavamo sulla 104, ronaldo, fagiolina, ecc… sei la mia vita e sei sempre stata importante per me dal primo giorno in cui abbiamo iniziato a parlare. spero ele che un giorno potremmo seriamente vivere insieme nella stessa casa per sempre, è il mio unico sogno e giuro che mi impegnerò a far sì che diventi realtà. voglio vivere per sempre con te ele, ti amo. sei tutto ciò che ho sempre desiderato, e spero che quando starai leggendo questa lettera ti troverai tra le mie braccia.<br><br>
+                ti amo ele, con affetto karim il tuo tuo!
             </div>
             <button class="pixel-btn" onclick="nextScreen('screen-collage')">AVANTI</button>
         </div>
@@ -418,17 +417,13 @@
 
     <script>
         function nextScreen(screenId) {
-            // Nasconde tutte le schermate
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
-            // Mostra quella richiesta
             document.getElementById(screenId).classList.add('active');
 
-            // SE stiamo entrando nella schermata della musica, CARICA E FAI PARTIRE IL VIDEO IN AUTOMATICO
             if (screenId === 'screen-music') {
                 const player = document.getElementById('yt-player');
-                // Aggiunto "?autoplay=1" alla fine del link per avviarlo da solo
                 player.src = "https://www.youtube.com/embed/Ek_IHMFI6FM?autoplay=1";
             }
         }
